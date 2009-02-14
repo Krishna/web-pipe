@@ -1,0 +1,18 @@
+body {
+    font-family: palatino, palatino linotype, georgia, serif;
+    font-size: 10pt;
+    text-align: center;
+}
+
+#content {
+    text-align: left;
+    margin: 0 auto;
+}
+
+.code {
+    font-family: monaco, consolas, andale mono, lucidatypewriter, monospace;
+    float: left;
+    white-space: pre;
+    font-size: 6pt;
+    background-color: #f0f0f0;
+}

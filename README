@@ -1,0 +1,29 @@
+INTRODUCTION
+
+web-pipe is a simple, bare-bones web content generation tool. I just wanted something to help generate static web content in a really simple manner.
+
+REQUIREMENTS
+
+You will need:
+	- Ruby
+	- The rdiscount gem (http://github.com/rtomayko/rdiscount/tree/master)
+
+
+GETTING STARTED
+
+1. Create your content as Markdown files. Save these files in the InTray directory with the file extension '.md.txt'
+2. Run the gen.rb script. This will:
+	- generate one HTML file for each file in the InTray. HTML files are placed in the OutTray directory
+	- each file in the InTray is then moved to the Archives directory. The filename is changed so it has a date stamp prefix: YYYYMMDD_<original filename>
+
+TEMPLATES? STYLESHEETS?
+
+At the moment there is only one template supported and that is buried in the gen.rb script.
+
+The template makes use of a CSS stylesheet, found at: OutTray/styles/main.css
+
+ENHANCEMENTS
+
+- Need a script to generate an index (front) page for a website
+- Need a script to generate an RSS or ATOM feed for the website
+- Need a script that will upload the generated web content to a web host

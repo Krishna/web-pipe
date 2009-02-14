@@ -1,0 +1,1 @@
+After the gen.rb script has run, your original files from the InTray directory will be moved here.
