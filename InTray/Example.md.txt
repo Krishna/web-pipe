@@ -1,7 +1,0 @@
-#Example
-
-##Welcome
-
-Welcome to web-pipe.
-
-Copy/create your articles using Markdown, and save them in this directory with a '.md.txt' file extension.
