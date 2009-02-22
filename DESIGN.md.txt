@@ -1,0 +1,14 @@
+This file serves as a log of the design decisions made on the project.
+
+---
+
+Now creating the datestamps for the output filename using the source file's creation time.
+
+Modified the html output generation routine to take the source file's creation and last modified timestamps.
+
+---
+
+No longer am moving files from the InTray directory to an Archives directory.
+The thinking here is that we should get the 'date created' and 'date updated' information directly from the filestamps in the filesystem. This makes it a lot easier to edit a specific file at a later date.
+
+Drawback: everytime you generate the site, every file will need to be processed. This shouldn't be a problem for anything but MASSIVE sites.

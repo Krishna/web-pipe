@@ -1,14 +1,26 @@
 body {
     font-family: palatino, palatino linotype, georgia, serif;
-    font-size: 10pt;
+    font-size: em;
     text-align: center;
 }
 
-#content {
+.content {
     text-align: left;
-    margin: 0 auto;
+	margin-left: 1em;
 }
 
+.header {
+	margin-left: 1em;
+	margin-right: 1em;	
+	text-align: right;		
+}
+
+.footer {
+	border-top: 1px solid silver;
+	margin-left: 1em;
+	margin-right: 1em;	
+	text-align: right;	
+}
 .code {
     font-family: monaco, consolas, andale mono, lucidatypewriter, monospace;
     float: left;
@@ -16,3 +28,5 @@ body {
     font-size: 6pt;
     background-color: #f0f0f0;
 }
+
+

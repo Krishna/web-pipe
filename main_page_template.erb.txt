@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title><%= page.title %></title>
+	<link rel="stylesheet" href="<%= main_stylesheet_filename %>" type="text/css" media="screen" charset="utf-8">
+</head>
+<body>
+  <div class="header">
+	<p><a href="index.html">home</a></p>
+  </div>
+  <div class="content">
+    <%= page.content %>
+  </div>
+  <div class="footer">
+	<p><a href="index.html">home</a></p>
+	<p style="text-align: right;">
+	  <small>
+		  Updated <%= page.last_modified_time.strftime("%A, %d %B %Y at %H:%M") %><br />
+		  Created <%= page.creation_time.strftime("%A, %d %B %Y at %H:%M") %>
+	  </small>
+	</p>
+
+    <p style="text-align: right;">	
+		<small>&copy K. Kotecha, 2007 - <%= Time.now.strftime("%Y") %>. All Rights Reserved. </small>
+	</p>
+  </div>
+</body>
+</html>  

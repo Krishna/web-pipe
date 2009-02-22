@@ -1,89 +1,75 @@
 #!/usr/bin/env ruby -rubygems -wKU
 
 require 'rdiscount'
+require 'time'
+require 'index'
+require 'erb'
+require 'page'
 
 INTRAY_DIR = "InTray"
 OUTTRAY_DIR = "OutTray"
-ARCHIVE_DIR = "Archives"
+
 MAIN_STYLESHEET_FILENAME = "styles/main.css"
+MAIN_DOCUMENT_TEMPLATE = "main_page_template.erb.txt"
 
-def convert_file_contents_to_html(markdown_filename)
-  input_file = File.new(markdown_filename)
-  markdown_source = input_file.read
-  markdown = RDiscount.new(markdown_source)
-  input_file.close
-  
-  markdown.to_html
+INDEX_STYLESHEET = MAIN_STYLESHEET_FILENAME
+CREATION_TIME_INDEX_TEMPLATE = "index_creation_time_page_template.erb.txt"
+MODIFIED_TIME_INDEX_TEMPLATE = "index_modified_time_page_template.erb.txt"
+
+CREATED_AT_INDEX_FILENAME = "archives.html"
+LAST_MODIFIED_INDEX_FILENAME = "index.html"
+
+
+def datestamp_filename(basefilename, creation_time, extension = nil)
+  common_part = "#{creation_time.strftime("%Y%m%d")}_#{basefilename}"
+  return common_part if extension == nil
+  "#{common_part}.#{extension}"
 end
 
-def get_base_filename(filename)
-    # expected extension is: .md.txt
-    expected_extension_index = filename.rindex('.md.txt')
-    return filename[0, expected_extension_index] if expected_extension_index
-    
-    # got an extension other that .md.txt
-    # just treat everything past the last period as the extension...
-    extension = File.extname(filename)
-    File.basename(filename, extension)
+def embed_in_html_template(template_filename, 
+                           page, main_stylesheet_filename)
+                           
+                           
+    template = IO.read(template_filename)
+    template = ERB.new(template)
+    template.result(binding)
 end
 
-def datestamp_filename(basefilename, extension = nil)
-  t = Time.now
-  return "#{t.strftime("%Y%m%d")}_#{basefilename}" if extension == nil
-  "#{t.strftime("%Y%m%d")}_#{basefilename}.#{extension}"
+def should_ignore?(filename)
+  (filename == "." || filename == ".." || filename == ".DS_Store")
 end
-
-def embed_in_html_template(title, main_stylesheet_filename, content)
-  <<-EOT
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
-   "http://www.w3.org/TR/html4/strict.dtd">
-
-<html lang="en">
-<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>#{title}</title>
-	<link rel="stylesheet" href="#{main_stylesheet_filename}" type="text/css" media="screen" charset="utf-8">
-</head>
-<body>
-  #{content}
-</body>
-</html>  
-EOT
-end
-
 
 def process_in_tray
-
+  
+  created_at_index = Index.new("Articles organized by Creation Time", INDEX_STYLESHEET, CREATION_TIME_INDEX_TEMPLATE, :latest_first)
+  last_modified_index = Index.new("Articles organized by Last Update Time", INDEX_STYLESHEET, MODIFIED_TIME_INDEX_TEMPLATE, :latest_first)
+  
   Dir.entries(INTRAY_DIR).each do |filename|
-    next if filename == "." || filename == ".." || filename == ".DS_Store"
-    
-    path_and_filename = File.join(INTRAY_DIR, filename)
-    next if !File.file?(path_and_filename) # skip directories
+    next if should_ignore?(filename)
 
-    base_filename = get_base_filename(filename)
+    page = Page.new(INTRAY_DIR, filename)
     
-    #   convert the markdown content to html
-    html = convert_file_contents_to_html(path_and_filename)
+    next if !File.file?(page.path_and_filename) # skip directories
 
-    #   embed the converted content into a style/site template
-    title = base_filename
-    html = embed_in_html_template(title, MAIN_STYLESHEET_FILENAME, html)
+    #   embed the converted content into a style/site template        
+    html = embed_in_html_template(MAIN_DOCUMENT_TEMPLATE, page, MAIN_STYLESHEET_FILENAME)
 
     #   generate an appropriate output filename
-    output_filename  = datestamp_filename(base_filename, "html")
+    page.output_filename  = datestamp_filename(page.title, page.creation_time, "html")
 
+    #   update the indices...
+    created_at_index.add_entry(page.creation_time, page)
+    last_modified_index.add_entry(page.last_modified_time, page)
+    
     #   write the file to the OutTray 
-    File.open(File.join(OUTTRAY_DIR, output_filename), "w") do |out|
+    File.open(File.join(OUTTRAY_DIR, page.output_filename), "w") do |out|
       out.puts html      
     end
     
-    #   rename the markdown file to have a date stamp
-    archive_filename = datestamp_filename(filename)
-
-    #   move the markdown file to the Archives
-    FileUtils.mv(path_and_filename, File.join(ARCHIVE_DIR, archive_filename))
   end
 
+  created_at_index.generate_in_file(File.join(OUTTRAY_DIR, CREATED_AT_INDEX_FILENAME))
+  last_modified_index.generate_in_file(File.join(OUTTRAY_DIR, LAST_MODIFIED_INDEX_FILENAME))
 end
 
 
