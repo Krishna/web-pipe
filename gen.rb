@@ -5,7 +5,7 @@ require 'rdiscount'
 INTRAY_DIR = "InTray"
 OUTTRAY_DIR = "OutTray"
 ARCHIVE_DIR = "Archives"
-MAIN_STYLESHEET_FILENAME = "style/main.css"
+MAIN_STYLESHEET_FILENAME = "styles/main.css"
 
 def convert_file_contents_to_html(markdown_filename)
   input_file = File.new(markdown_filename)
