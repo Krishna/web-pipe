@@ -8,15 +8,27 @@
 	<link rel="stylesheet" href="<%= @stylesheet %>" type="text/css" media="screen" charset="utf-8">
 </head>
 <body>
+  <div class="header">
+  </div>
+	
   <div class="content">
+	<h1><%= @title %></h1>
     <div class="index">
 		<% sorted_by_date_keys.each do |key| %>
-		<p><a href="<%= @index[key] %>"><%= @index[key] %></a></p>
+		<p>
+			<a href="<%= @index[key].output_filename %>"><%= @index[key].title %></a><br />
+			<small>
+				<%= @index[key].last_modified_time.strftime("%A, %d %B %Y at %H:%M") %>
+			</small>
+		</p>
 		<% end %>
 	</div>
   </div>
+
   <div class="footer">
-    <p>&copy K. Kotecha</p>
+    <p>	
+		<small>&copy K. Kotecha, 2007 - <%= Time.now.strftime("%Y") %>. All Rights Reserved. </small>
+	</p>
   </div>
 </body>
 </html>  

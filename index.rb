@@ -1,4 +1,6 @@
+require 'page'
 require 'erb'
+
 
 class Index
   
@@ -10,8 +12,8 @@ class Index
     @earliest_first = (order == :earliest_first) 
   end
   
-  def add_entry(timestamp, filename)
-    @index[timestamp] = filename
+  def add_entry(timestamp, page)
+    @index[timestamp] = page
   end
   
   def sorted_keys

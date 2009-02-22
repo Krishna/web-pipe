@@ -7,6 +7,8 @@ class Page
   attr_reader :last_modified_time
   attr_reader :content
 
+  attr_accessor :output_filename
+
 
   def initialize(directory, filename)
     @filename = filename

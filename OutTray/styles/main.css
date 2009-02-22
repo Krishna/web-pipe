@@ -9,12 +9,17 @@ body {
 	margin-left: 1em;
 }
 
+.header {
+	margin-left: 1em;
+	margin-right: 1em;	
+	text-align: right;		
+}
+
 .footer {
 	border-top: 1px solid silver;
 	margin-left: 1em;
 	margin-right: 1em;	
-	text-align: left;
-	
+	text-align: right;	
 }
 .code {
     font-family: monaco, consolas, andale mono, lucidatypewriter, monospace;

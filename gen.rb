@@ -8,12 +8,16 @@ require 'page'
 
 INTRAY_DIR = "InTray"
 OUTTRAY_DIR = "OutTray"
+
 MAIN_STYLESHEET_FILENAME = "styles/main.css"
 MAIN_DOCUMENT_TEMPLATE = "main_page_template.erb.txt"
+
 INDEX_STYLESHEET = MAIN_STYLESHEET_FILENAME
-INDEX_TEMPLATE = "index_page_template.erb.txt"
-CREATED_AT_INDEX_FILENAME = "index.html"
-LAST_MODIFIED_INDEX_FILENAME = "recently_updated.html"
+CREATION_TIME_INDEX_TEMPLATE = "index_creation_time_page_template.erb.txt"
+MODIFIED_TIME_INDEX_TEMPLATE = "index_modified_time_page_template.erb.txt"
+
+CREATED_AT_INDEX_FILENAME = "archives.html"
+LAST_MODIFIED_INDEX_FILENAME = "index.html"
 
 
 def datestamp_filename(basefilename, creation_time, extension = nil)
@@ -37,8 +41,8 @@ end
 
 def process_in_tray
   
-  created_at_index = Index.new("Index by Create Time", INDEX_STYLESHEET, INDEX_TEMPLATE, :latest_first)
-  last_modified_index = Index.new("Index by Modified Time", INDEX_STYLESHEET, INDEX_TEMPLATE, :latest_first)
+  created_at_index = Index.new("Articles organized by Creation Time", INDEX_STYLESHEET, CREATION_TIME_INDEX_TEMPLATE, :latest_first)
+  last_modified_index = Index.new("Articles organized by Last Update Time", INDEX_STYLESHEET, MODIFIED_TIME_INDEX_TEMPLATE, :latest_first)
   
   Dir.entries(INTRAY_DIR).each do |filename|
     next if should_ignore?(filename)
@@ -51,14 +55,14 @@ def process_in_tray
     html = embed_in_html_template(MAIN_DOCUMENT_TEMPLATE, page, MAIN_STYLESHEET_FILENAME)
 
     #   generate an appropriate output filename
-    output_filename  = datestamp_filename(page.title, page.creation_time, "html")
+    page.output_filename  = datestamp_filename(page.title, page.creation_time, "html")
 
     #   update the indices...
-    created_at_index.add_entry(page.creation_time, output_filename)
-    last_modified_index.add_entry(page.last_modified_time, output_filename)
+    created_at_index.add_entry(page.creation_time, page)
+    last_modified_index.add_entry(page.last_modified_time, page)
     
     #   write the file to the OutTray 
-    File.open(File.join(OUTTRAY_DIR, output_filename), "w") do |out|
+    File.open(File.join(OUTTRAY_DIR, page.output_filename), "w") do |out|
       out.puts html      
     end
     
