@@ -1,10 +1,23 @@
 #!/usr/bin/env ruby -rubygems -wKU
 
 require 'rdiscount'
+require 'time'
 
 INTRAY_DIR = "InTray"
 OUTTRAY_DIR = "OutTray"
 MAIN_STYLESHEET_FILENAME = "styles/main.css"
+
+
+#
+# Following method is for OSX only.
+#
+def osx_create_time(filename)
+  Time.parse(`mdls -name kMDItemContentCreationDate -raw #{filename}`)
+end
+
+def last_modified_time(filename)
+  File.mtime(filename)
+end
 
 def convert_file_contents_to_html(markdown_filename)
   input_file = File.new(markdown_filename)
@@ -26,13 +39,14 @@ def get_base_filename(filename)
     File.basename(filename, extension)
 end
 
-def datestamp_filename(basefilename, extension = nil)
-  t = Time.now
-  return "#{t.strftime("%Y%m%d")}_#{basefilename}" if extension == nil
-  "#{t.strftime("%Y%m%d")}_#{basefilename}.#{extension}"
+def datestamp_filename(basefilename, creation_time, extension = nil)
+  common_part = "#{creation_time.strftime("%Y%m%d")}_#{basefilename}"
+  return common_part if extension == nil
+  "#{common_part}.#{extension}"
 end
 
-def embed_in_html_template(title, main_stylesheet_filename, content)
+def embed_in_html_template(title, main_stylesheet_filename, content, 
+                           creation_time, last_modified_time)
   <<-EOT
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
    "http://www.w3.org/TR/html4/strict.dtd">
@@ -48,7 +62,9 @@ def embed_in_html_template(title, main_stylesheet_filename, content)
     #{content}
   </div>
   <div class="footer">
-    <p>K. Kotecha</p>
+    <p>&copy K. Kotecha</p>
+    <p>created on: #{creation_time}</p>
+    <p>last modified on: #{last_modified_time}</p>
   </div>
 </body>
 </html>  
@@ -71,15 +87,21 @@ def process_in_tray
 
     #   embed the converted content into a style/site template
     title = base_filename
-    html = embed_in_html_template(title, MAIN_STYLESHEET_FILENAME, html)
+    creation_time = osx_create_time(path_and_filename)
+    last_modified_time = last_modified_time(path_and_filename)
+        
+    html = embed_in_html_template(title, MAIN_STYLESHEET_FILENAME, html, 
+                                  creation_time, last_modified_time)
 
     #   generate an appropriate output filename
-    output_filename  = datestamp_filename(base_filename, "html")
+    output_filename  = datestamp_filename(base_filename, creation_time, "html")
 
     #   write the file to the OutTray 
     File.open(File.join(OUTTRAY_DIR, output_filename), "w") do |out|
       out.puts html      
     end
+    
+    puts "#{output_filename}"
     
   end
 
