@@ -58,9 +58,9 @@ def process_in_tray
     page.output_filename  = datestamp_filename(page.title, page.creation_time, "html")
 
     #   update the indices...
-    created_at_index.add_entry(page.creation_time, page)
-    last_modified_index.add_entry(page.last_modified_time, page)
-    
+    created_at_index.add_entry(page)
+    last_modified_index.add_entry(page)
+        
     #   write the file to the OutTray 
     File.open(File.join(OUTTRAY_DIR, page.output_filename), "w") do |out|
       out.puts html      
@@ -68,8 +68,8 @@ def process_in_tray
     
   end
 
-  created_at_index.generate_in_file(File.join(OUTTRAY_DIR, CREATED_AT_INDEX_FILENAME))
-  last_modified_index.generate_in_file(File.join(OUTTRAY_DIR, LAST_MODIFIED_INDEX_FILENAME))
+  created_at_index.generate_in_file(:creation_time, File.join(OUTTRAY_DIR, CREATED_AT_INDEX_FILENAME))
+  last_modified_index.generate_in_file(:last_modified_time, File.join(OUTTRAY_DIR, LAST_MODIFIED_INDEX_FILENAME))
 end
 
 
