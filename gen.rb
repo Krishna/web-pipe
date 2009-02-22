@@ -2,6 +2,7 @@
 
 require 'rdiscount'
 require 'time'
+require 'index'
 
 INTRAY_DIR = "InTray"
 OUTTRAY_DIR = "OutTray"
@@ -71,9 +72,11 @@ def embed_in_html_template(title, main_stylesheet_filename, content,
 EOT
 end
 
-
 def process_in_tray
-
+  
+  created_at_index = Index.new
+  last_modified_index = Index.new
+  
   Dir.entries(INTRAY_DIR).each do |filename|
     next if filename == "." || filename == ".." || filename == ".DS_Store"
     
@@ -96,15 +99,18 @@ def process_in_tray
     #   generate an appropriate output filename
     output_filename  = datestamp_filename(base_filename, creation_time, "html")
 
+    #   update the indices...
+    created_at_index.add_entry(creation_time, output_filename)
+    last_modified_index.add_entry(last_modified_time, output_filename)
+    
     #   write the file to the OutTray 
     File.open(File.join(OUTTRAY_DIR, output_filename), "w") do |out|
       out.puts html      
     end
     
-    puts "#{output_filename}"
-    
   end
 
+  created_at_index.generate
 end
 
 
