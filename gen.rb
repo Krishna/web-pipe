@@ -3,11 +3,16 @@
 require 'rdiscount'
 require 'time'
 require 'index'
+require 'erb'
 
 INTRAY_DIR = "InTray"
 OUTTRAY_DIR = "OutTray"
 MAIN_STYLESHEET_FILENAME = "styles/main.css"
-
+MAIN_DOCUMENT_TEMPLATE = "main_page_template.erb.txt"
+INDEX_STYLESHEET = MAIN_STYLESHEET_FILENAME
+INDEX_TEMPLATE = "index_page_template.erb.txt"
+CREATED_AT_INDEX_FILENAME = "index.html"
+LAST_MODIFIED_INDEX_FILENAME = "recently_updated.html"
 
 #
 # Following method is for OSX only.
@@ -46,30 +51,13 @@ def datestamp_filename(basefilename, creation_time, extension = nil)
   "#{common_part}.#{extension}"
 end
 
-def embed_in_html_template(title, main_stylesheet_filename, content, 
+def embed_in_html_template(template_filename, 
+                           title, main_stylesheet_filename, content, 
                            creation_time, last_modified_time)
-  <<-EOT
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
-   "http://www.w3.org/TR/html4/strict.dtd">
-
-<html lang="en">
-<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>#{title}</title>
-	<link rel="stylesheet" href="#{main_stylesheet_filename}" type="text/css" media="screen" charset="utf-8">
-</head>
-<body>
-  <div class="content">
-    #{content}
-  </div>
-  <div class="footer">
-    <p>&copy K. Kotecha</p>
-    <p>created on: #{creation_time}</p>
-    <p>last modified on: #{last_modified_time}</p>
-  </div>
-</body>
-</html>  
-EOT
+                           
+    template = IO.read(template_filename)
+    template = ERB.new(template)
+    template.result(binding)
 end
 
 def should_ignore?(filename)
@@ -78,8 +66,8 @@ end
 
 def process_in_tray
   
-  created_at_index = Index.new
-  last_modified_index = Index.new
+  created_at_index = Index.new("Index by Create Time", INDEX_STYLESHEET, INDEX_TEMPLATE, :latest_first)
+  last_modified_index = Index.new("Index by Modified Time", INDEX_STYLESHEET, INDEX_TEMPLATE, :latest_first)
   
   Dir.entries(INTRAY_DIR).each do |filename|
     next if should_ignore?(filename)
@@ -97,7 +85,7 @@ def process_in_tray
     creation_time = osx_create_time(path_and_filename)
     last_modified_time = last_modified_time(path_and_filename)
         
-    html = embed_in_html_template(title, MAIN_STYLESHEET_FILENAME, html, 
+    html = embed_in_html_template(MAIN_DOCUMENT_TEMPLATE, title, MAIN_STYLESHEET_FILENAME, html, 
                                   creation_time, last_modified_time)
 
     #   generate an appropriate output filename
@@ -114,7 +102,8 @@ def process_in_tray
     
   end
 
-  created_at_index.generate
+  created_at_index.generate_in_file(File.join(OUTTRAY_DIR, CREATED_AT_INDEX_FILENAME))
+  last_modified_index.generate_in_file(File.join(OUTTRAY_DIR, LAST_MODIFIED_INDEX_FILENAME))
 end
 
 
