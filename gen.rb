@@ -4,8 +4,7 @@ require 'rdiscount'
 
 INTRAY_DIR = "InTray"
 OUTTRAY_DIR = "OutTray"
-ARCHIVE_DIR = "Archives"
-MAIN_STYLESHEET_FILENAME = "style/main.css"
+MAIN_STYLESHEET_FILENAME = "styles/main.css"
 
 def convert_file_contents_to_html(markdown_filename)
   input_file = File.new(markdown_filename)
@@ -45,7 +44,12 @@ def embed_in_html_template(title, main_stylesheet_filename, content)
 	<link rel="stylesheet" href="#{main_stylesheet_filename}" type="text/css" media="screen" charset="utf-8">
 </head>
 <body>
-  #{content}
+  <div class="content">
+    #{content}
+  </div>
+  <div class="footer">
+    <p>K. Kotecha</p>
+  </div>
 </body>
 </html>  
 EOT
@@ -77,11 +81,6 @@ def process_in_tray
       out.puts html      
     end
     
-    #   rename the markdown file to have a date stamp
-    archive_filename = datestamp_filename(filename)
-
-    #   move the markdown file to the Archives
-    FileUtils.mv(path_and_filename, File.join(ARCHIVE_DIR, archive_filename))
   end
 
 end

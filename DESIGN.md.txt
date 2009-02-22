@@ -1,0 +1,8 @@
+This file serves as a log of the design decisions made on the project.
+
+---
+
+No longer am moving files from the InTray directory to an Archives directory.
+The thinking here is that we should get the 'date created' and 'date updated' information directly from the filestamps in the filesystem. This makes it a lot easier to edit a specific file at a later date.
+
+Drawback: everytime you generate the site, every file will need to be processed. This shouldn't be a problem for anything but MASSIVE sites.
