@@ -72,13 +72,17 @@ def embed_in_html_template(title, main_stylesheet_filename, content,
 EOT
 end
 
+def should_ignore?(filename)
+  (filename == "." || filename == ".." || filename == ".DS_Store")
+end
+
 def process_in_tray
   
   created_at_index = Index.new
   last_modified_index = Index.new
   
   Dir.entries(INTRAY_DIR).each do |filename|
-    next if filename == "." || filename == ".." || filename == ".DS_Store"
+    next if should_ignore?(filename)
     
     path_and_filename = File.join(INTRAY_DIR, filename)
     next if !File.file?(path_and_filename) # skip directories
